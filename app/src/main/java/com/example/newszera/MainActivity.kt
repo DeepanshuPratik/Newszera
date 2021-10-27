@@ -37,11 +37,12 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
 
     }
     private fun fetchData()  {
-        val url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=06e1a2895f3a4b418b274cec72972799"
+        val url = "https://newsapi.org/v2/top-headlines?country=in&apiKey="+R.id.apikey
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET,
             url,
             null,
             Response.Listener{
+
                 val newsJsonArray = it.getJSONArray("articles")
                 val newsArray = ArrayList<News>()
                 for(i in 0 until newsJsonArray.length()){
@@ -56,10 +57,11 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                 }
                 madapter.updatenews(newsArray)
             },
-            Response.ErrorListener {
+            {
 
             }
         )
+
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 

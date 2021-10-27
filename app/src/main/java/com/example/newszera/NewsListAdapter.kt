@@ -16,7 +16,7 @@ class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adap
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
         val viewHolder = NewsViewHolder(view)
         view.setOnClickListener {
-            listener.onItemClicked(items[viewHolder.adapterPosition])
+            listener.onItemClicked(items[viewHolder.absoluteAdapterPosition])
         }
         return viewHolder
     }
