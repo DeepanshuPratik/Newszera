@@ -8,12 +8,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.Response.Listener
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -37,8 +40,10 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
 
     }
     private fun fetchData()  {
-        val url = "https://newsapi.org/v2/top-headlines?country=in&apiKey="+R.id.apikey
-        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET,
+        val url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=06e1a2895f3a4b418b274cec72972799"
+        val queue = Volley.newRequestQueue(this)
+        val getRequest: JsonObjectRequest = object : JsonObjectRequest(
+            Request.Method.GET,
             url,
             null,
             Response.Listener{
@@ -57,17 +62,24 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                 }
                 madapter.updatenews(newsArray)
             },
-            {
+            Response.ErrorListener { error ->
 
             }
-        )
+        ) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["User-Agent"] = "Mozilla/5.0"
+                return params
+            }
+        }
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        queue.add(getRequest)
     }
 
     override fun onItemClicked(item: News) {
-//        val openURL = Intent(Intent.ACTION_VIEW)
-//        openURL.data = Uri.parse(item.url)
-//        startActivity(openURL)
+        val builder = CustomTabsIntent.Builder()
+        val customTabsIntent: CustomTabsIntent = builder.build()
+        customTabsIntent.launchUrl(this, Uri.parse(item.url))
     }
 }
