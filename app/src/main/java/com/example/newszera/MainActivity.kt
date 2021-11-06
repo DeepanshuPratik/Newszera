@@ -3,41 +3,29 @@ package com.example.newszera
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import java.util.Random
-import android.os.Looper
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.Response.Listener
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.example.shareconnect.MySingleton
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
-import org.json.JSONObject
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity(), NewsItemClicked {
-     private var url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=06e1a2895f3a4b418b274cec72972799"
-     private lateinit var madapter: NewsListAdapter
 
+    private var url = ""
+     private lateinit var madapter: NewsListAdapter
+    private var imageUrl =""
+    var name=""
+    private var p by Delegates.notNull<Int>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getSupportActionBar()?.setDisplayShowHomeEnabled(true);
@@ -46,25 +34,37 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
         setContentView(R.layout.activity_main)
         recyclerView.layoutManager = LinearLayoutManager(this)
 //        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        name= intent.getStringExtra("name_extra").toString()
+        p = intent.getIntExtra("id",0)
+        val ai: ApplicationInfo = applicationContext.packageManager
+            .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
+        val value = ai.metaData["apiValue"]
+        val key = value.toString()
+        // val category = arrayOf("&category=business", "&category=science", "&category=sports", "&category=technology","","&category=general","&category=entertainment","&category=health")
+        if(p!=1)
+            url = "https://newsapi.org/v2/top-headlines?country=in&category="+name+"&apiKey="+key
+        else url="https://newsapi.org/v2/everything?q="+name+"&sortBy=publishedAt"+"&apiKey="+key
         fetchData()
         madapter = NewsListAdapter(this)
         recyclerView.adapter = madapter
-        refresh()
+        refresh(name)
 
     }
 
-    private fun refresh() {
+    private fun refresh(name: String) {
         swipeRefreshLayout.setOnRefreshListener {
             val ai: ApplicationInfo = applicationContext.packageManager
                 .getApplicationInfo(applicationContext.packageName, PackageManager.GET_META_DATA)
             val value = ai.metaData["apiValue"]
             val key = value.toString()
-            val category = arrayOf("&category=business", "&category=science", "&category=sports", "&category=technology","","&category=general","&category=entertainment","&category=health")
-                url = "https://newsapi.org/v2/top-headlines?country=in"+category[Random().nextInt(8)]+"&apiKey="+key
+           // val category = arrayOf("&category=business", "&category=science", "&category=sports", "&category=technology","","&category=general","&category=entertainment","&category=health")
+            if(p!=1)
+                url = "https://newsapi.org/v2/top-headlines?country=in&category="+name+"&apiKey="+key
+            else url="https://newsapi.org/v2/everything?q="+name+"&sortBy=publishedAt"+"&apiKey="+key
                 fetchData()
                 madapter = NewsListAdapter(this)
                 recyclerView.adapter = madapter
-                refresh()
+                refresh(name)
 
             swipeRefreshLayout.isRefreshing = false
         }
@@ -112,5 +112,29 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
         val builder = CustomTabsIntent.Builder()
         val customTabsIntent: CustomTabsIntent = builder.build()
         customTabsIntent.launchUrl(this, Uri.parse(item.url))
+    }
+
+    override fun onItemClickedb(item: News) {
+        val imageUrl= item.url
+        val image = item.imageUrl
+        val share = Intent.createChooser(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Hey! check out this latest news shared by my app Newz Today:   $imageUrl")
+
+            // (Optional) Here we're setting the title of the content
+            putExtra(Intent.EXTRA_TITLE, "Share this News using: ")
+
+            // (Optional) Here we're passing a content URI to an image to be displayed
+            data = image.toUri()
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            type = "text/html"
+        }, null)
+        startActivity(share)
+//        val intent = Intent(Intent.ACTION_SEND)
+//        intent.type="image/jpeg"
+//        intent.putExtra(Intent.EXTRA_STREAM, image)
+//        //intent.putExtra(Intent.EXTRA_TEXT, "Hey! check out this latest news shared by my app Newz Today $imageUrl" )
+//        val chooser = Intent.createChooser(intent, "Share this Newz using:")
+//        startActivity(chooser)
     }
 }

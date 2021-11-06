@@ -20,6 +20,17 @@ class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adap
         view.setOnClickListener {
             listener.onItemClicked(items[viewHolder.absoluteAdapterPosition])
         }
+        view.setOnLongClickListener {
+            listener.onItemClickedb(items[viewHolder.absoluteAdapterPosition])
+            return@setOnLongClickListener true
+        }
+//        call= (Button) view.findViewById(R.id.button);
+//        val call
+//        call.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v)
+//            {
+//                dialContactPhone("Some phone number");
+
         return viewHolder
     }
 
@@ -52,6 +63,9 @@ class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
 interface NewsItemClicked{
     fun onItemClicked(item : News){
+
+    }
+    fun onItemClickedb(item : News){
 
     }
 }
