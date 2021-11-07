@@ -24,12 +24,6 @@ class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adap
             listener.onItemClickedb(items[viewHolder.absoluteAdapterPosition])
             return@setOnLongClickListener true
         }
-//        call= (Button) view.findViewById(R.id.button);
-//        val call
-//        call.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v)
-//            {
-//                dialContactPhone("Some phone number");
 
         return viewHolder
     }
@@ -37,10 +31,9 @@ class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adap
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem= items[position]
         holder.titleView.text= currentItem.title
-        if(currentItem.author != null){
-//            currentItem.author = "hindustantimes.com"
-            holder.author.text= currentItem.author
-        }
+        if(currentItem.author.length == 0)
+            currentItem.author = "hindustantimes.com"
+        holder.author.text= currentItem.author
         Glide.with(holder.itemView.context).load(currentItem.imageUrl).into(holder.image)
     }
 

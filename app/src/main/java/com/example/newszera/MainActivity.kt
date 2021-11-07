@@ -15,6 +15,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.properties.Delegates
 
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
                         newsJsonObject.getString("urlToImage"),
+                        newsJsonObject.getString("description")
                     )
                     newsArray.add(news)
                 }
@@ -109,9 +111,18 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
     }
 
     override fun onItemClicked(item: News) {
-        val builder = CustomTabsIntent.Builder()
-        val customTabsIntent: CustomTabsIntent = builder.build()
-        customTabsIntent.launchUrl(this, Uri.parse(item.url))
+        val bundle = Bundle()
+        val fragment = BottomSheetDialogFragment()
+        bundle.putString("imageUrl",item.imageUrl)
+        bundle.putString("url",item.url)
+        bundle.putString("title",item.title)
+        bundle.putString("text",item.description)
+        bundle.putString("author",item.author)
+        fragment.arguments = bundle
+        fragment.show(supportFragmentManager, "add_to_album")
+//        val builder = CustomTabsIntent.Builder()
+//        val customTabsIntent: CustomTabsIntent = builder.build()
+//        customTabsIntent.launchUrl(this, Uri.parse(item.url))
     }
 
     override fun onItemClickedb(item: News) {
