@@ -1,13 +1,10 @@
 package com.example.newszera
 
-import android.content.Intent
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
@@ -31,8 +28,9 @@ class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adap
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem= items[position]
         holder.titleView.text= currentItem.title
-        if(currentItem.author.length == 0)
+        if(currentItem.author.isEmpty()) {
             currentItem.author = "hindustantimes.com"
+        }
         holder.author.text= currentItem.author
         Glide.with(holder.itemView.context).load(currentItem.imageUrl).into(holder.image)
     }
@@ -55,7 +53,7 @@ class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 }
 
 interface NewsItemClicked{
-    fun onItemClicked(item : News){
+    fun onItemClicked(item: News){
 
     }
     fun onItemClickedb(item : News){
